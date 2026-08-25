@@ -1,0 +1,41 @@
+body {
+    background-color: rgb(25,35,40);
+}
+
+main {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+h2 {
+    color: rgb(255, 246, 209);
+    text-align: center;
+}
+
+textarea {
+    resize: none;
+    box-sizing: border-box;
+    background-color: rgb(20,25,30);
+    color: rgb(255, 246, 209);
+    min-width: 300px;
+    margin: 10px;
+}
+
+button {
+    height: 30px;
+    width: 100px;
+    background-color: rgb(20,25,30);
+    color: rgb(255, 246, 209);
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.input-field {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
