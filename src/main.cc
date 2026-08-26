@@ -26,11 +26,14 @@ int main() {
 	uniform_int_distribution<cpp_int> ui(-(cpp_int(1) << 256), cpp_int(1)<<256);
 	for(unsigned i = 0; i < 5; i++)
 		ui(mt);
+	cpp_int p = prime_test(mt);
 	
-	
-	cpp_int p = 0;//prime_test();
-	cpp_int q = 0;//prime_test();
-
+	/*mt19937 tm
+	uniform_int_distribution<cpp_int> ui(-(cpp_int(1) << 256), cpp_int(1)<<256);
+	for(unsigned i = 0; i < 5; i++)
+		ui(tm);
+	cpp_int q = prime_test(tm);
+*/
 	cpp_int t = (p-1) * (q-1);
 	cpp_int n = p * q;
 	const cpp_int e = 65537;
