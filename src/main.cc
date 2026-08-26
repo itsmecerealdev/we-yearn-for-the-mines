@@ -1,40 +1,61 @@
-#include "/public/read.h" // IWYU pragma: keep
-#include <boost/multiprecision/fwd.hpp>
-#include <vector>         // IWYU pragma: keep
-#include <boost/multiprecision/cpp_int.hpp>
-#include <boost/multiprecision/miller_rabin.hpp>
-using namespace boost::multiprecision;
-using namespace boost::random;
-using namespace std;
- 
-cpp_int prime_test(cpp_int num) {
-	if (miller_rabin_test(num, 50)) {
-  		return num;
-     } else {
-		num += 2;
-		prime_test(num);
-	 }
+#include <boost/asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/beast.hpp>
 
+#include <boost/beast/core/buffers_to_string.hpp>
+#include <boost/multiprecision/fwd.hpp>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <functional>
+#include <iostream>
+#include <string>
+
+using namespace std;
+using tcp = boost::asio::ip::tcp;
+using namespace boost::multiprecision;
+namespace websocket = boost::beast::websocket;
+
+cpp_int encode(function<cpp_int(cpp_int)> func, cpp_int val) {
+	return func(val);
+}
+
+cpp_int decode(function<cpp_int(cpp_int)> func, cpp_int val) {
+	return func(val);
+}
+
+cpp_int encrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
+	return func(val);
+}
+
+cpp_int decrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
+	return func(val);
 }
 
 int main() {
-	//Two very large prime numbers
-	cpp_int p = 0;
-	cpp_int q = 0;
-
-	mt19937 mt
-	uniform_int_distribution<cpp_int> ui(-(cpp_int(1) << 256), cpp_int(1)<<256);
-	for(unsigned i = 0; i < 5; i++)
-		ui(mt);
-	
-	
-	cpp_int p = 0;//prime_test();
-	cpp_int q = 0;//prime_test();
-
-	cpp_int t = (p-1) * (q-1);
-	cpp_int n = p * q;
-	const cpp_int e = 65537;
-	cpp_int d = pow(e, -1) % T;
-	cpp_int m = 0; //Email integer (Decrypting is pow(S, D) % N)
-	cpp_int s = pow(m,65537);
+	int port = 6969;
+	try {
+		boost::asio::io_context context;
+		tcp::acceptor acceptor(context, tcp::endpoint(tcp::v4(),port));
+		cout << "Listening on: " << port << endl;
+		while(true) {
+			tcp::socket socket(context);
+			acceptor.accept(socket);
+			cout << "Client accepted\n";
+			websocket::stream<tcp::socket> ws(move(socket));
+			ws.accept();
+			while(true) {
+				boost::beast::flat_buffer fb;
+				ws.read(fb);
+				string message = boost::beast::buffers_to_string(fb.data());
+				cout << "Received: " << message << endl;
+				//switch statement will go here
+				// do thing with message
+				string response;
+				ws.text(true);
+				ws.write(boost::asio::buffer(response));
+			}
+		}
+	}
+	catch(const exception& err) {
+		cerr << "Server error: " << err.what() << endl;
+	}
 }
