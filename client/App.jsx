@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import './App.css'
 
 function App() {
@@ -28,6 +28,55 @@ function App() {
     }
   }
 
+  const [messages, setMessages] = useState([]);
+
+    const [input, setInput] = useState("");
+
+    const socketRef = useRef(null);
+
+    useEffect(() => {
+
+        const socket = new WebSocket("ws://localhost:8080");
+
+        // Save the socket so other functions can use it
+        socketRef.current = socket;
+
+        socket.onopen = () => {
+            console.log("Connected to C++ server");
+        };
+
+        //whenevr u get a msg this runs
+        socket.onmessage = (event) => {
+            console.log("Received:", event.data);
+
+            setMessages((oldMessages) => [
+                ...oldMessages,
+                event.data
+            ]);
+        };
+
+       
+        socket.onclose = () => {
+            console.log("Disconnected from server");
+        };
+
+        // closes the scket when the connection stops
+        return () => {
+            socket.close();
+        };
+    }, []);
+
+    function sendMessage() {
+        if (
+            socketRef.current &&
+            socketRef.current.readyState === WebSocket.OPEN
+        ) {
+            socketRef.current.send(input);
+
+            setInput("");
+        }
+    }
+
   return (
     <>
       <main>
@@ -38,30 +87,30 @@ function App() {
         <button onClick={generateKeys}>Generate Keys</button>
         <textarea id="" rows="10" cols="50" placeholder="Prime Number Generator Output Here" readonly value={readableKeys}></textarea>
         
-            <h2>Prime Number Generation</h2>
+            {/* <h2>Prime Number Generation</h2>
             <div class="input-field">
                 <textarea id="prime-number-gen" rows="10" cols="50" placeholder="Prime Number Generator Output Here" readonly value={readableKeys}></textarea>
             </div>
-            <button>Generate</button>
-            <h2>RSA Encryption and Decryption</h2>
-            <div class="input-field">
-                <textarea id="rsa-encryption" rows="10" cols="50" placeholder="Text to Encrypt"></textarea>
-                <textarea id="rsa-decryption" rows="10" cols="50" placeholder="Text to Decrypt"></textarea>
-            </div>              
-            <div>
-                <button>Encrypt</button>
-                <button>Decrypt</button>
-            </div>  
-            <h2>Encoding and Decoding</h2>            
-            <div class="input-field">
-                <textarea id="encoding" rows="10" cols="50" placeholder="Text to Encode"></textarea>
-                <textarea id="decoding" rows="10" cols="50" placeholder="Text to Decode"></textarea>
-            </div>
-            <div>
-                <button>Encode</button>
-                <button>Decode</button>
-            </div>  
-        </main>
+            <button>Generate</button> */}
+        <h2>RSA Encryption and Decryption</h2>
+        <div class="input-field">
+          <textarea id="rsa-encryption" rows="10" cols="50" placeholder="Text to Encrypt"></textarea>
+          <textarea id="rsa-decryption" rows="10" cols="50" placeholder="Text to Decrypt"></textarea>
+        </div>              
+        <div>
+          <button>Encrypt</button>
+          <button>Decrypt</button>
+        </div>  
+        <h2>Encoding and Decoding</h2>            
+        <div class="input-field">
+          <textarea id="encoding" rows="10" cols="50" placeholder="Text to Encode"></textarea>
+          <textarea id="decoding" rows="10" cols="50" placeholder="Text to Decode"></textarea>
+        </div>
+        <div>
+          <button>Encode</button>
+          <button>Decode</button>
+        </div>  
+      </main>
     </>
   )
 }
