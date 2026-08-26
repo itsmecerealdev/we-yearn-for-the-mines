@@ -13,11 +13,13 @@ function App() {
   const [encryptedText, setEncryptedText] = useState("")
   const [decryptedText, setDecryptedText] = useState("")
   const [readableKeys, setReadableKeys] = useState("")
+  const [pubKeyDummy, setPubKeyDummy] = useState("32")
+  const [privKeyDummy, setPrivKeyDummy] = useState("42")
 
   async function generateKeys() {
     setStatus("Generating keys...")
     try {
-        setKeys({ privateKey: { name: "42" }, publicKey: { name: "32" } })
+        setKeys({ privateKey: { name: privKeyDummy }, publicKey: { name: pubKeyDummy } })
         setStatus("Keys generated successfully")
         setReadableKeys(`Private Key: ${keys?.privateKey?.name}, Public Key: ${keys?.publicKey?.name}`)
     } catch (error) {
@@ -29,9 +31,13 @@ function App() {
   return (
     <>
       <main>
+        <br></br>
         { <p> {status} </p> }
+        <br></br>
+        <h2>Key Generation</h2>
         <button onClick={generateKeys}>Generate Keys</button>
-       
+        <textarea id="" rows="10" cols="50" placeholder="Prime Number Generator Output Here" readonly value={readableKeys}></textarea>
+        
             <h2>Prime Number Generation</h2>
             <div class="input-field">
                 <textarea id="prime-number-gen" rows="10" cols="50" placeholder="Prime Number Generator Output Here" readonly value={readableKeys}></textarea>
