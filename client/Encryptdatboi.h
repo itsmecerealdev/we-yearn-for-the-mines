@@ -1,10 +1,8 @@
 #ifndef ENCRYPTDATBOI_H
 #define ENCRYPTDATBOI_H
-
 #include <boost/multiprecision/cpp_int.hpp>
-
 #include <stdexcept>
-
+using namesapce std;
 using boost::multiprecision::cpp_int;
 
 struct PublicKey {
@@ -37,7 +35,6 @@ inline cpp_int encrypt(const cpp_int& message, const PublicKey& publicKey) {
     if (message < 0 || message >= publicKey.modulus) {
         throw std::invalid_argument("Message must be in the range [0, modulus)");
     }
-
     return boost::multiprecision::powm(message, publicKey.e, publicKey.modulus);
 
 }
@@ -46,8 +43,26 @@ inline cpp_int decrypt(const cpp_int& encryptedMessage, const PrivateKey& privat
     if (encryptedMessage < 0 || encryptedMessage >= privateKey.modulus) {
         throw std::invalid_argument("Encrypted message must be in the range [0, modulus)");
     }
-
     return boost::multiprecision::powm(encryptedMessage, privateKey.exponent, privateKey.modulus);
+}
+
+inline cpp_int encode(const string& text) {
+    cpp_int value = 0;
+    for (char c : text) {
+        value <<= 8;
+        value += static_cast<unsigned char>(c);
+    }
+}
+
+inline string decode(cpp_int value) {
+    string text;
+    while (value > 0) {
+        unsigned int characterVal = (value & 0xFF).convert_to<unsigned int>();
+        text += static_cast<char>(characterVal);
+        value >>= 8;
+    }
+    reverse(text.begin(), text.end());
+    return text;
 }
 
 #endif
