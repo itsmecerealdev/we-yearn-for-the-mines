@@ -14,6 +14,7 @@
 #include <boost/multiprecision/miller_rabin.hpp>
 #include <boost/random.hpp>
 
+#include "../client/Encryptdatboi.h"
 
 using namespace boost::multiprecision;
 using namespace boost::random;
@@ -41,13 +42,13 @@ cpp_int decode(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
 }
 
-cpp_int encrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
+/*cpp_int encrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
 }
 
 cpp_int decrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
-}
+}*/
 
 
 int main() {
@@ -72,10 +73,10 @@ int main() {
 				cpp_int numVal(val);
 				switch(message.at(0)) {
 					case '1':
-						response = "1-" + encrypt(/*yourfuncHere*/, numVal).str();  
+						response = "1-" + encrypt(numVal, publicKey).str(); 
 						break;
 					case '2':
-						response = "2-" + decrypt(/*yourfuncHere*/, numVal).str();  
+						response = "2-" + decrypt(numVal, privateKey).str();  
 						break;
 					case '3':
 						response = "3-" + encode(/*yourfuncHere*/, numVal).str();  
