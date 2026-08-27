@@ -31,15 +31,15 @@ inline cpp_int greatestCommonDivisor(cpp_int left, cpp_int right) {
 	return boost::multiprecision::gcd(left, right);
 }
 
-inline cpp_int encrypt(const cpp_int& message, const PublicKey& publicKey) {
+inline cpp_int encryptH(const cpp_int& message, const PublicKey& publicKey) {
     if (message < 0 || message >= publicKey.modulus) {
         throw std::invalid_argument("Message must be in the range [0, modulus)");
     }
-    return boost::multiprecision::powm(message, publicKey.e, publicKey.modulus);
+    return boost::multiprecision::powm(message, publicKey.exponent, publicKey.modulus);
 
 }
 
-inline cpp_int decrypt(const cpp_int& encryptedMessage, const PrivateKey& privateKey) {
+inline cpp_int decryptH(const cpp_int& encryptedMessage, const PrivateKey& privateKey) {
     if (encryptedMessage < 0 || encryptedMessage >= privateKey.modulus) {
         throw std::invalid_argument("Encrypted message must be in the range [0, modulus)");
     }
