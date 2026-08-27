@@ -47,9 +47,26 @@ int main() {
 				ws.read(fb);
 				string message = boost::beast::buffers_to_string(fb.data());
 				cout << "Received: " << message << endl;
-				//switch statement will go here
-				// do thing with message
-				string response;
+				string response = "";
+				string val = message.substr(2, string::npos);
+				cpp_int numVal(val);
+				switch(message.at(0)) {
+					case '1':
+						response = "1-" + encrypt(/*yourfuncHere*/, numVal).str();  
+						break;
+					case '2':
+						response = "2-" + decrypt(/*yourfuncHere*/, numVal).str();  
+						break;
+					case '3':
+						response = "3-" + encode(/*yourfuncHere*/, numVal).str();  
+						break;
+					case '4': 
+						response = "4-" + decode(/*yourfuncHere*/, numVal).str();  
+						break;
+					default:
+						cerr << "Malphormed data: " << message << endl;
+						exit(1);
+				}
 				ws.text(true);
 				ws.write(boost::asio::buffer(response));
 			}
