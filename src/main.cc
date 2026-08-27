@@ -1,18 +1,38 @@
-#include <boost/asio.hpp>
-#include <boost/asio/io_context.hpp>
-#include <boost/beast.hpp>
-
-#include <boost/beast/core/buffers_to_string.hpp>
-#include <boost/multiprecision/fwd.hpp>
-#include <boost/multiprecision/cpp_int.hpp>
+#include "/public/read.h" // IWYU pragma: keep
+#include <vector>         // IWYU pragma: keep
 #include <functional>
 #include <iostream>
 #include <string>
 
-using namespace std;
+#include <boost/asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <boost/beast.hpp>
+#include <boost/beast/core/buffers_to_string.hpp>
+#include <boost/multiprecision/fwd.hpp>
+
+#include <boost/multiprecision/cpp_int.hpp>
+#include <boost/multiprecision/miller_rabin.hpp>
+#include <boost/random.hpp>
+
+#include "../client/Encryptdatboi.h"
+
+using namespace boost::multiprecision;
+using namespace boost::random;
 using tcp = boost::asio::ip::tcp;
 using namespace boost::multiprecision;
+using namespace std;
 namespace websocket = boost::beast::websocket;
+
+ //Prime test function
+cpp_int prime_test(cpp_int num) {
+	if (miller_rabin_test(num, 50)) {
+  		if (miller_rabin_test(num-1/2, 50))
+		return num;
+     } else {
+		num += 2;
+		prime_test(num);
+	 }
+	}
 
 cpp_int encode(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
@@ -22,13 +42,14 @@ cpp_int decode(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
 }
 
-cpp_int encrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
+/*cpp_int encrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
 }
 
 cpp_int decrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
-}
+}*/
+
 
 cpp_int signMessage(cpp_int message, cpp_int privateExponent, cpp_int modulus) {
 	return powm(message, privateExponent, modulus);
@@ -93,4 +114,40 @@ int main() {
 	catch(const exception& err) {
 		cerr << "Server error: " << err.what() << endl;
 	}
+	
+	
+	//Two very large prime numbers
+	cpp_int p = 0;
+	cpp_int q = 0;
+	boost::mt19937 mt
+	boost::random::uniform_int_distribution<cpp_int> gen(0, cpp_int(1)<<256);
+	
+	p = gen(mt);
+	while(true) {
+		if (p % 2 == 0) {
+			p = gen(mt);
+		} else {
+			break;
+		}
+	}
+	
+	p = prime_test(p);
+
+
+	while(true) {
+		if (q % 2 == 0) {
+			q = gen(mt);
+		} else {
+			break;
+		}
+	}
+
+	q = prime_test(q);
+
+	cpp_int t = (p-1) * (q-1);
+	cpp_int n = p * q;
+	const cpp_int e = 65537;
+	cpp_int d = pow(e, -1) % T;
+	cpp_int m = 0; //Email integer (Decrypting is pow(S, D) % N)
+	cpp_int s = pow(m,65537);
 }
