@@ -30,8 +30,16 @@ cpp_int decrypt(function<cpp_int(cpp_int)> func, cpp_int val) {
 	return func(val);
 }
 
+cpp_int signMessage(cpp_int message, cpp_int privateExponent, cpp_int modulus) {
+	return powm(message, privateExponent, modulus);
+}
+
 int main() {
 	int port = 6969;
+	cpp_int publicKey;
+	cpp_int privateKey;
+	cpp_int modulus;
+
 	try {
 		boost::asio::io_context context;
 		tcp::acceptor acceptor(context, tcp::endpoint(tcp::v4(),port));
@@ -51,18 +59,28 @@ int main() {
 				string val = message.substr(2, string::npos);
 				cpp_int numVal(val);
 				switch(message.at(0)) {
-					case '1':
-						response = "1-" + encrypt(/*yourfuncHere*/, numVal).str();  
-						break;
-					case '2':
-						response = "2-" + decrypt(/*yourfuncHere*/, numVal).str();  
-						break;
-					case '3':
-						response = "3-" + encode(/*yourfuncHere*/, numVal).str();  
-						break;
-					case '4': 
-						response = "4-" + decode(/*yourfuncHere*/, numVal).str();  
-						break;
+
+					
+				//	case '1':
+				//		response = "1-" + encrypt(/*yourfuncHere*/, numVal).str();  
+				//		break;
+						
+				//	case '2':
+				//		response = "2-" + decrypt(/*yourfuncHere*/, numVal).str();  
+				//		break;
+				//	case '3':
+				//		response = "3-" + encode(/*yourfuncHere*/, numVal).str();  
+				//		break;
+				//	case '4': 
+				//		response = "4-" + decode(/*yourfuncHere*/, numVal).str();  
+				//		break;
+
+				case '5': {
+					cpp_int signature = signMessage(numVal, privateKey, modulus);
+					response = "5-" + signature.str();
+					break;
+					}		
+
 					default:
 						cerr << "Malphormed data: " << message << endl;
 						exit(1);
