@@ -28,13 +28,14 @@ namespace websocket = boost::beast::websocket;
  //Prime test function
 cpp_int prime_test(cpp_int num) {
 	if (miller_rabin_test(num, 50)) {
-  		if (miller_rabin_test(num-1/2, 50))
+		// if (miller_rabin_test(num-1/2, 50))
 		return num;
-     } else {
-		num += 2;
-		prime_test(num);
-	 }
-	}
+	} 
+	// else {
+	num += 2;
+	return prime_test(num);
+	// }
+}
 
 cpp_int encode(const function<cpp_int(string)>& func, string val) {
 	return func(val);
@@ -44,16 +45,20 @@ string decode(const function<string(cpp_int)>& func, cpp_int val) {
 	return func(val);
 }
 
-cpp_int encrypt(const function<cpp_int(PrivateKey, cpp_int)>& func, PrivateKey pk, cpp_int val) {
-	return func(pk, val);
+cpp_int encrypt(const function<cpp_int(cpp_int, PublicKey)>& func, cpp_int val, PublicKey pk) {
+	return func(val, pk);
 }
 
-cpp_int decrypt(const function<cpp_int(PublicKey, cpp_int)>& func, PublicKey pk, cpp_int val) {
-	return func(pk, val);
+cpp_int decrypt(const function<cpp_int(cpp_int, PrivateKey)>& func, cpp_int val, PrivateKey pk) {
+	return func(val, pk);
 }
 
 cpp_int signMessage(cpp_int message, cpp_int privateExponent, cpp_int modulus) {
 	return powm(message, privateExponent, modulus);
+}
+
+cpp_int verifyMessage(cpp_int message, cpp_int publicExponent, cpp_int publicModulus) {
+	return powm(message, publicExponent, publicModulus);
 }
 
 cpp_int modInverse(cpp_int a, cpp_int m) {
@@ -116,6 +121,13 @@ int main() {
 	cpp_int m = 0; //Email integer (Decrypting is pow(S, D) % N)
 	cpp_int s = pow(m,65537);
 
+	PublicKey pubKey;
+	pubKey.modulus = n;
+	pubKey.exponent = e;
+	PrivateKey privKey;
+	privKey.modulus = n;
+	privKey.exponent = d;
+
 	try {
 		boost::asio::io_context context;
 		tcp::acceptor acceptor(context, tcp::endpoint(tcp::v4(),port));
@@ -133,28 +145,48 @@ int main() {
 				cout << "Received: " << message << endl;
 				string response = "";
 				string val = message.substr(2, string::npos);
-				cpp_int numVal(val);
+				cout << message.at(0) << endl;
+				cout << val << endl;
 				switch(message.at(0)) {
-					case '1':
-						response = "1-" + encrypt(/*yourfuncHere*/, numVal).str();  
+					case '1': {
+						cpp_int numVal(val);
+						response = "1-" + encrypt(encryptH, numVal, pubKey).str();  
 						break;
-					case '2':
-						response = "2-" + decrypt(/*yourfuncHere*/, numVal).str();  
+					}
+					case '2': {
+						cpp_int numVal(val);
+						response = "2-" + decrypt(decryptH, numVal, privKey).str();  
 						break;
+					}
 					case '3':
+						cout << "encoding " << endl;
 						response = "3-" + encode(stringToint, val).str();  
 						break;
-					case '4': 
+					case '4': {
+						cpp_int numVal(val);
 						response = "4-" + decode(intTostring, numVal);  
 						break;
+					}
 					case '5': {
-						response = "5-" + signMessage(numVal, privateKey, modulus).str();
+						cpp_int numVal(val);
+						response = "5-" + signMessage(numVal, privKey.exponent, privKey.modulus).str();
 						break;
+					}
+					case '6': {
+						cpp_int numVal(val);
+						response = "6-" + verifyMessage(numVal, pubKey.exponent, pubKey.modulus).str();
+						break;
+					}
+					case '7': {
+						response = "7-" + pubKey.exponent.str() + "-" + pubKey.modulus.str() + "-" + privKey.exponent.str() + "-" + privKey.modulus.str();
+						break;	
 					}
 					default:
 						cerr << "Malphormed data: " << message << endl;
+						cerr.flush();
 						exit(1);
 				}
+				cout << response << endl;
 				ws.text(true);
 				ws.write(boost::asio::buffer(response));
 			}
