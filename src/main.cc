@@ -97,7 +97,7 @@ int main() {
 				//		break;
 
 				case '5': {
-					cpp_int signature = signMessage(numVal, privateKey, modulus);
+					cpp_int signature = signMessage(numVal, d, n);
 					response = "5-" + signature.str();
 					break;
 					}		
