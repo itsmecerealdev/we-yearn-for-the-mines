@@ -3,6 +3,8 @@
 #include <functional>
 #include <iostream>
 #include <string>
+#include "Bridges.h"
+#include "GraphAdjList.h"
 
 #include <boost/asio.hpp>
 #include <boost/asio/io_context.hpp>
@@ -21,6 +23,7 @@ using namespace boost::random;
 using tcp = boost::asio::ip::tcp;
 using namespace boost::multiprecision;
 using namespace std;
+using namespace bridges;
 namespace websocket = boost::beast::websocket;
 
  //Prime test function
@@ -56,6 +59,12 @@ cpp_int signMessage(cpp_int message, cpp_int privateExponent, cpp_int modulus) {
 }
 
 int main() {
+	Bridges bridges(18, "gTayona", 964981320515);
+	bridges.setTitle("We Yearn For the Mines");
+	bridges.setDescription("Graph connecting the variables of RSA");
+
+	GraphAdjList<cpp_int> graph;
+	
 	int port = 6969;
 	cpp_int publicKey;
 	cpp_int privateKey;
@@ -146,8 +155,30 @@ int main() {
 
 	cpp_int t = (p-1) * (q-1);
 	cpp_int n = p * q;
-	const cpp_int e = 65537;
+	cpp_int e = 65537;
 	cpp_int d = pow(e, -1) % T;
 	cpp_int m = 0; //Email integer (Decrypting is pow(S, D) % N)
 	cpp_int s = pow(m,65537);
+
+	graph.addVertex(p);
+	graph.addVertex(q);
+	graph.addVertex(t);
+	graph.addVertex(n);
+	graph.addVertex(e);
+	graph.addVertex(d);
+	graph.addVertex(m);
+	graph.addVertex(s);
+
+	graph.addEdge(p);
+	graph.addEdge(q);
+	graph.addEdge(t);
+	graph.addEdge(n);
+	graph.addEdge(e);
+	graph.addEdge(d);
+	graph.addEdge(m);
+	graph.addEdge(s);
+
+	bridges.setDataStructure(&graph);
+	bridges.visualize();
+	return 0;
 }
