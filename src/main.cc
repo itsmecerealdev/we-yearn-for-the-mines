@@ -168,8 +168,7 @@ int main() {
 						break;
 					}
 					case '5': {
-						cpp_int numVal(val);
-						response = "5-" + signMessage(numVal, privKey.exponent, privKey.modulus).str();
+						response = "5-" + signMessage(numVal, d, n).str();
 						break;
 					}
 					case '6': {
